@@ -1,0 +1,46 @@
+RICHMOND MOTOR CLUB — OBSERVER SCORING APP
+
+NEW APP PACKAGE
+Extract this ZIP. Upload the CONTENTS of this folder to a new, separate static website or Vercel project with index.html at the root. No build command or dependencies are needed. This package has not been deployed.
+Use a separate website address from the original Observer Scoring App. Richmond scores use their own local storage key; the original app's scores are not imported automatically.
+For a quick desktop check, open index.html after extracting all files. Home-screen installation and offline caching require HTTPS hosting.
+
+PASSWORD
+Event Set Up: Richmond2027!
+Save & Sending: Richmond2027!
+The password is requested each time either screen is opened, from the navigation or home buttons. Scoring and score lookup remain unlocked.
+This is a local screen lock in an offline app, not server authentication or encryption. Someone who can inspect or edit the app code/browser storage can bypass it. Use server access controls if stronger protection is required.
+
+SET UP
+Enter the event, date, section(s), laps, observer and secretary email.
+Enter the WebDAV HTTPS FOLDER link, for example:
+https://your-server.example/remote.php/dav/files/observer/event-scores/
+Optional WebDAV username is saved on this device. WebDAV passwords remain in memory only: re-enter after closing/reloading the app, either in Event Set Up or the Send File popup.
+Do not use a public browser-view/share page as the WebDAV folder URL. Use the actual endpoint supplied by your server administrator. The destination folder must already exist.
+
+SENDING
+Open Save & Sending with the password. Select the section under Send File.
+EMAIL / WHATSAPP: where file sharing is supported, choose the requested app from the phone's share menu, then the recipient and send. Browsers cannot force a particular app or automatically attach a file to mailto/WhatsApp web links. If file sharing is unavailable, choose DOWNLOAD CSV TO ATTACH, then OPEN EMAIL/WHATSAPP and attach the downloaded CSV manually. Verify the recipient and attachment.
+WEBDAV: performs an HTTPS PUT upload to your configured folder. Timestamped filenames keep separate uploads from overwriting earlier ones. The app confirms success only after a successful server response. Failure/timeout messages retain all local scores. On a timeout, check the folder before retrying, since the server may have received the file.
+Turn off airplane mode and connect before sending.
+
+WEBDAV SERVER REQUIREMENTS
+The folder must allow writes. For a server on a different origin, configure CORS for the hosted app's exact origin, allow OPTIONS and PUT, and allow Content-Type and Authorization headers. OPTIONS preflight must succeed. Basic authentication/app passwords are supported; cookie-based login and redirected endpoints are not. Use a dedicated account with access limited to the scores folder.
+No server URL was supplied, so live WebDAV delivery has not been tested.
+
+SCORES LOG
+On Scoring, select CHECK ALL SCORES LOG beside SCORES RECORDED.
+The full-page popup displays every current score in entry order: oldest at the top, latest at the bottom. It includes entry number, entry time, section, rider, lap, score and correction note. Corrections keep their entry position; Undo removes the score. Close with BACK TO SCORING or X. This is a current-score log, not a permanent audit trail of deleted entries.
+The original recent-score table remains newest-first with its 100-entry limit; the full-page log has no such limit.
+
+OFFLINE / ORIGINAL FEATURES
+Open the hosted app online first so its service worker can cache all files. Add to Home Screen, then test reopening with airplane mode enabled before an event. Scoring continues offline and saves locally. Keep screen awake remains available on supported devices.
+The 300-rider CSV grid, missing-score MS values and first-section-save rule for observing two sections are retained. Send or save the first section to unlock the second, as in the base app.
+Do not clear browser data or reset before backing up/sending your scores.
+
+VALIDATION
+Passed code-level tests: password reject/unlock/re-entry, 120 scores in full-log order, 600-row two-lap CSV with MS, Email/WhatsApp fallback links, simulated WebDAV PUT success/403 failure, score retention, password non-persistence, JavaScript syntax and cache asset paths.
+Browser preview was unavailable in this session. Mobile visual layout, native phone sharing and live offline reopening need device checks before event use.
+
+300-RIDER UPDATE
+Supports rider numbers 1–300. CSV exports include all 300 riders and every configured lap, using MS for missing scores. Existing event data is retained when updating at the same website address. Replace the hosted files, reopen online and refresh to obtain this version before going offline.

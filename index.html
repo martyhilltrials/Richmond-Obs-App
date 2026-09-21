@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Richmond Motor Club • Observer Scoring</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111111">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Richmond Motor Club • Observer Scoring">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20260921-richmond-v1">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20260921-richmond-v1">
+
+<style>
+:root{--yellow:#c4b164;--black:#111;--bg:#f1f1f1;--paper:#fff;--line:#d8d8d8;--muted:#666;--good:#187a38;--bad:#b3261e}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#111}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:50;background:#111;color:#fff;border-bottom:6px solid var(--yellow);box-shadow:0 2px 10px #0003}
+.headerInner{max-width:1200px;margin:auto;padding:12px 14px}
+.titleRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:24px;margin:0}
+.small{font-size:12px;color:#ccc}
+nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:10px}
+nav button{min-width:0;border:1px solid #666;border-radius:9px;background:#222;color:white;padding:10px 7px;font-weight:bold;font-size:12px;white-space:normal}
+nav button.active{background:var(--yellow);color:#111;border-color:#111}
+main{max-width:1200px;margin:auto;padding:15px 12px 45px}
+.page{display:none}.page.active{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:0 1px 5px #0001;margin-bottom:14px;overflow:hidden}
+.cardHead{background:#111;color:white;padding:11px 14px;font-weight:bold}
+.cardBody{padding:14px}
+.homeGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.homeBtn{min-height:120px;border:3px solid #111;border-radius:14px;background:white;padding:14px;font-weight:bold;font-size:18px}
+.homeBtn b{display:block;font-size:24px;margin-bottom:7px}
+.homeBtn.yellow{background:var(--yellow)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.field label{display:block;font-weight:bold;font-size:12px;color:#555;margin-bottom:5px;text-transform:uppercase}
+.field input,.field select{width:100%;padding:11px;border:1px solid #aaa;border-radius:8px;background:white}
+.checkField{display:flex;align-items:center;gap:10px;min-height:45px;padding-top:17px}
+.checkField input{width:22px;height:22px;flex:0 0 auto}
+.checkField label{font-weight:bold;font-size:13px;text-transform:uppercase}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{display:inline-block;border:2px solid #111;border-radius:9px;padding:10px 13px;background:var(--yellow);color:#111;font-weight:bold;text-decoration:none}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.alt{background:#fff}.btn.dark{background:#111;color:#fff}.btn.red{background:#fff;color:var(--bad);border-color:var(--bad)}
+.notice{padding:10px;border-radius:8px;background:#f7f7f7;border:1px solid #ddd;margin-top:10px;font-size:13px}
+.tableWrap{overflow:auto;border:1px solid #bbb;max-height:55vh;background:white}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:12px}
+th,td{padding:7px;border-right:1px solid #ddd;border-bottom:1px solid #ddd;white-space:nowrap;text-align:center}
+th{position:sticky;top:0;background:#111;color:white;z-index:5}
+.scorePanel{display:grid;grid-template-columns:1fr;gap:12px}
+.scoreTop{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:9px}
+.scoreEntryRow{display:grid;grid-template-columns:minmax(90px,.65fr) minmax(0,2.35fr);gap:9px;align-items:stretch}
+.currentRider{border:3px solid #111;border-radius:14px;background:#fff7b5;padding:8px;text-align:center;display:flex;align-items:center;justify-content:center;min-height:74px}
+.currentRider .no{font-size:42px;font-weight:900;line-height:1}
+.scoreButtons{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.scoreButtons button{min-height:74px;border:3px solid #111;border-radius:13px;font-size:30px;font-weight:900;background:#fff}
+.scoreButtons .zero{background:#e6f5e9}.scoreButtons .five{background:#ffe3df}
+.scoreStatus{font-size:14px;text-align:center;padding:9px;border-radius:8px;background:#f5f5f5}
+.scoreConfirmation{position:fixed;top:max(12px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:440px;z-index:10001;pointer-events:none;box-shadow:0 4px 20px #0005;border:3px solid #111;border-radius:12px;background:#e6f5e9;padding:14px;text-align:center;font-weight:900;font-size:20px}
+.toolButtons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:2px}
+.toolButtons button{min-height:48px}
+.modal{position:fixed;inset:0;z-index:200;background:#0009;display:flex;align-items:center;justify-content:center;padding:14px}
+.modalBox{width:min(620px,100%);max-height:90vh;overflow:auto;background:#fff;border:3px solid #111;border-radius:14px;box-shadow:0 10px 35px #0006}
+.modalHead{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#111;color:#fff;padding:12px 14px;font-weight:bold}
+.modalClose{border:0;background:transparent;color:#fff;font-size:28px;line-height:1;padding:0 5px}
+.modalBody{padding:14px}
+.lookupGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}
+.lookupResult{margin-top:12px}
+.lookupResult table{width:100%;min-width:0}
+.lookupResult th{position:static}
+.correctionScores{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:10px}
+.correctionScores button{min-height:55px;border:2px solid #111;border-radius:9px;background:#fff;font-size:22px;font-weight:900}
+.bigInput{font-size:24px;font-weight:bold;text-align:center}
+.saveGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.saveBox{border:2px solid #111;border-radius:12px;padding:15px;background:white}
+.saveBox h3{margin:0 0 6px}
+.helpHero{background:#111;color:#fff;border-bottom:8px solid var(--yellow);padding:22px;border-radius:13px;margin-bottom:14px}
+.helpHero h2{margin:0 0 7px;font-size:28px}.helpHero p{margin:0;color:#ddd;line-height:1.5}
+.helpQuickLinks{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.helpQuickLinks a{display:inline-block;background:var(--yellow);color:#111;border:2px solid #111;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:bold;text-decoration:none}
+.helpSection{scroll-margin-top:150px}
+.helpSection h2{margin:0 0 10px;font-size:21px}
+.helpSection h3{margin:18px 0 7px;font-size:16px}
+.helpSection p,.helpSection li{line-height:1.55}
+.helpSection ol,.helpSection ul{padding-left:24px}
+.helpTable{width:100%;min-width:0;font-size:13px;border-collapse:collapse}
+.helpTable th,.helpTable td{position:static;white-space:normal;text-align:left;vertical-align:top;border:1px solid #ccc;padding:9px}
+.helpTable th{background:var(--yellow);color:#111}
+.helpAlert{border:2px solid #b3261e;background:#fff1f0;border-radius:9px;padding:12px;margin:12px 0;line-height:1.5}
+.helpTip{border-left:6px solid var(--yellow);background:#fff9d7;padding:11px 12px;margin:12px 0;line-height:1.5}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi{background:#fafafa;border:1px solid #ddd;border-radius:9px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:22px}
+.kpi span{font-size:11px;color:#666}
+.hidden{display:none!important}
+footer{text-align:center;color:#777;font-size:12px;padding:20px}
+@media(max-width:680px){
+  .headerInner{padding:9px}
+  h1{font-size:20px}
+  nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  nav button{font-size:10px;padding:9px 4px}
+  main{padding:10px 8px 30px}
+  .homeGrid{grid-template-columns:1fr}
+  .scoreEntryRow{grid-template-columns:minmax(78px,.55fr) minmax(0,2.45fr);gap:6px}
+  .currentRider{min-height:64px;padding:6px}
+  .currentRider .no{font-size:34px}
+  .scoreButtons{gap:5px}
+  .scoreButtons button{min-height:64px;font-size:25px}
+  .toolButtons{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .scoreTop{grid-template-columns:1fr 1fr}
+  .scoreConfirmation{font-size:17px}
+  .correctionScores{gap:5px}
+  .helpHero{padding:17px}.helpHero h2{font-size:23px}
+  .helpSection{scroll-margin-top:210px}
+}
+
+.airplaneReminder{position:fixed;top:max(12px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:10000;width:calc(100% - 28px);max-width:440px;padding:12px 16px;border:2px solid #111;border-radius:10px;background:#ffd51a;color:#111;box-shadow:0 3px 14px #0004;font-size:14px;font-weight:bold;text-align:center;pointer-events:none}
+.screenAwake{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:8px 12px;font-size:12px;color:#555}
+
+.clubBrand{display:flex;align-items:center;gap:12px}.clubBrand img{width:64px;height:64px;border-radius:50%}.clubBrand span{color:#dac985;font-size:14px}.recordedHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#allScoresModal{padding:0;z-index:200}#allScoresModal .modalBox{width:100%;max-width:none;height:100dvh;max-height:100dvh;border-radius:0;display:flex;flex-direction:column}#allScoresModal .modalBody{display:flex;flex-direction:column;min-height:0;flex:1}#allScoresModal .tableWrap{flex:1;max-height:none;overflow:auto}#allScoresModal td{font-size:15px}#allScoresModal .modalHead{flex-shrink:0}.sendChoices{display:grid;gap:12px;margin:16px 0}.sendChoices button{min-height:52px}#passwordError{color:#b3261e;min-height:20px}#sendStatus{white-space:pre-line}button:focus-visible,input:focus-visible{outline:3px solid #987c24;outline-offset:3px}@media(max-width:500px){.clubBrand img{width:48px;height:48px}.clubBrand h1{font-size:19px}.titleRow{gap:6px}.recordedHead .btn{font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+<div class="headerInner">
+  <div class="titleRow">
+    <div class="clubBrand"><img src="richmond-logo.jpg" alt="Richmond Motor Club Yorkshire Ltd"><div><h1>Richmond Motor Club</h1><span>Observer Scoring App</span></div></div>
+    <div id="autosaveText" class="small">Ready</div>
+  </div>
+  <nav>
+    <button data-page="home" class="active">HOME</button>
+    <button data-page="setup">EVENT SET UP</button>
+    <button data-page="scoring">SCORING</button>
+    <button data-page="save">SAVE &amp; SENDING</button>
+    <button data-page="help">HELP</button>
+  </nav>
+</div>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="homeGrid">
+    <button class="homeBtn yellow" data-go="setup"><b>1</b>EVENT SET UP</button>
+    <button class="homeBtn" data-go="scoring"><b>2</b>SCORING</button>
+    <button class="homeBtn" data-go="save"><b>3</b>SAVE &amp; SENDING</button>
+    <button class="homeBtn" id="installAppBtn"><b>＋</b>ADD TO HOME SCREEN</button>
+    <button class="homeBtn" id="quickResume"><b>↻</b>RESUME LAST EVENT</button>
+    <button class="homeBtn yellow" data-go="help"><b>?</b>HELP &amp; USER GUIDE</button>
+    <button class="homeBtn" id="resetAppBtn"><b>⚠</b>RESET APP</button>
+  </div>
+</section>
+
+<section id="setup" class="page">
+  <div class="card">
+    <div class="cardHead">EVENT SET UP</div>
+    <div class="cardBody">
+      <div class="fields">
+        <div class="field">
+          <label for="eventName">EVENT NAME</label>
+          <input id="eventName">
+        </div>
+        <div class="field">
+          <label for="eventDate">DATE</label>
+          <input id="eventDate" type="date">
+        </div>
+        <div class="field">
+          <label for="sectionNumber">SECTION NUMBER</label>
+          <input id="sectionNumber" type="number" min="1" max="99" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="laps">NUMBER OF LAPS</label>
+          <input id="laps" type="number" min="1" max="20" value="2" inputmode="numeric">
+        </div>
+        <div class="checkField">
+          <input id="twoSections" type="checkbox">
+          <label for="twoSections">CLICK HERE IF OBSERVING 2 SECTIONS</label>
+        </div>
+        <div class="field hidden" id="secondSectionField">
+          <label for="secondSectionNumber">2ND SECTION NUMBER</label>
+          <input id="secondSectionNumber" type="number" min="1" max="99" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="observerName">OBSERVER NAME</label>
+          <input id="observerName">
+        </div>
+        <div class="field">
+          <label for="observerContact">OBSERVER CONTACT NUMBER</label>
+          <input id="observerContact" type="tel" inputmode="tel">
+        </div>
+        <div class="field">
+          <label for="secretaryEmail">SECRETARY EMAIL ADDRESS</label>
+          <input id="secretaryEmail" type="email" inputmode="email" autocomplete="email">
+        </div><div class="field"><label for="webdavUrl">WEBDAV SERVER FOLDER LINK</label><input id="webdavUrl" type="url" placeholder="https://server.example/scores/" autocomplete="off"><small>Enter the HTTPS folder where section CSV files should be uploaded.</small>
+        </div><div class="field"><label for="webdavUser">WEBDAV USERNAME (IF REQUIRED)</label><input id="webdavUser" autocomplete="off">
+        </div><div class="field"><label for="webdavPassword">WEBDAV PASSWORD (IF REQUIRED)</label><input id="webdavPassword" type="password" autocomplete="off"><small>Kept only while this app is open. Re-enter after reopening.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoring" class="page">
+  <div class="card">
+    <div class="cardHead">SCORING</div>
+    <div class="cardBody scorePanel">
+      <div class="scoreTop">
+        <div class="field">
+          <label for="scoreRiderNo">RIDER NUMBER</label>
+          <input id="scoreRiderNo" class="bigInput" inputmode="numeric" placeholder="No">
+        </div>
+        <div class="field">
+          <label for="scoreSection">SECTION</label>
+          <select id="scoreSection" class="bigInput"></select>
+        </div>
+      </div>
+
+      <div class="scoreEntryRow">
+        <div id="currentRider" class="currentRider">
+          <div class="no">—</div>
+        </div>
+
+        <div class="scoreButtons">
+          <button class="zero" data-score="0">0</button>
+          <button data-score="1">1</button>
+          <button data-score="2">2</button>
+          <button data-score="3">3</button>
+          <button class="five" data-score="5">5</button>
+        </div>
+      </div>
+
+      <div id="scoreStatus" class="scoreStatus">Enter a rider number to begin.</div>
+
+      <div id="scoreConfirmation" class="scoreConfirmation hidden" aria-live="polite"></div>
+
+      <div class="toolButtons">
+        <button class="btn alt" id="checkScoreBtn">CHECK SCORE</button>
+        <button class="btn alt" id="correctScoreBtn">CORRECT SCORE</button>
+        <button class="btn alt" id="undoBtn">UNDO LAST SCORE</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardHead recordedHead"><span>SCORES RECORDED</span><button class="btn" id="allScoresBtn">CHECK ALL SCORES LOG</button></div>
+    <div class="cardBody">
+      <div class="kpis">
+        <div class="kpi"><b id="kpiScores">0</b><span>Scores</span></div>
+        <div class="kpi"><b id="kpiRiders">0</b><span>Riders scored</span></div>
+        <div class="kpi"><b id="kpiSection">—</b><span>Current section</span></div>
+        <div class="kpi"><b id="kpiUnsaved">0</b><span>Since CSV save</span></div>
+      </div>
+      <div class="tableWrap" style="margin-top:10px">
+        <table id="scoreTable"></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="save" class="page">
+  <div class="saveGrid">
+    <div class="saveBox">
+      <h3>Save Scores CSV</h3>
+      <p>Save each section as its own CSV file.</p>
+      <div id="saveSectionTabs" class="actions"></div>
+    </div>
+
+    <div class="saveBox">
+      <h3>Send File</h3>
+      <p>Send each section as its own CSV file.</p>
+      <div id="shareSectionTabs" class="actions"></div>
+    </div>
+
+    <div class="saveBox">
+      <h3>Load Existing Scores</h3>
+      <p>Continue from a previously saved scoring CSV.</p>
+      <button class="btn alt" id="loadScoresBtn">Load Scores CSV</button>
+      <input id="scoreCsvFile" class="hidden" type="file" accept=".csv,text/csv">
+    </div>
+
+    <div class="saveBox">
+      <h3>Secretary Email Address</h3>
+      <p>Use this address when sending the completed section file.</p>
+      <div id="secretaryEmailDisplay" class="notice" style="font-size:17px;font-weight:bold;word-break:break-word">—</div>
+      <div class="actions">
+        <button class="btn alt" id="copySecretaryEmailBtn">COPY EMAIL ADDRESS</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="cardHead">CSV EXPORT SUMMARY</div>
+    <div class="cardBody"><div id="exportSummary" class="notice"></div></div>
+  </div>
+</section>
+
+<section id="help" class="page">
+  <div class="card"><div class="cardHead">RICHMOND MOTOR CLUB</div><div class="cardBody"><p>Event Set Up and Save &amp; Sending ask for the organiser password each time they are opened. Scoring and the full scores log remain available without it.</p><p>Set the WebDAV folder link in Event Set Up. Use Send File to choose Email, WhatsApp or WebDAV. Email and WhatsApp use your phone's share menu where supported; otherwise download the CSV and attach it manually. WebDAV needs an internet connection and browser uploads enabled on the server.</p><p>Check All Scores Log shows every current score, first entered at the top and latest at the bottom. Corrected scores keep their original position; undone scores are removed.</p></div></div>
+  <div class="helpHero">
+    <h2>HELP &amp; USER GUIDE</h2>
+    <p>Set up an event, record and correct scores, then save and send each section CSV.</p>
+    <div class="helpQuickLinks">
+      <a href="#helpQuickStart">QUICK START</a>
+      <a href="#helpSetup">EVENT SET UP</a>
+      <a href="#helpScoring">SCORING</a>
+      <a href="#helpSaving">SAVE &amp; SEND</a>
+      <a href="#helpTroubleshooting">TROUBLESHOOTING</a>
+    </div>
+  </div>
+
+  <div id="helpQuickStart" class="card helpSection">
+    <div class="cardHead">QUICK START</div>
+    <div class="cardBody">
+      <ol>
+        <li>Open <b>EVENT SET UP</b> and enter the event, date, section, laps and observer details. The rider limit is automatically set to 300.</li>
+        <li>If you are observing two sections, tick the option and enter the second section number.</li>
+        <li>Open <b>SCORING</b>, enter a rider number, confirm the section, then tap 0, 1, 2, 3 or 5.</li>
+        <li>Check the green confirmation shows the correct rider, lap, section and score.</li>
+        <li>Use <b>CHECK SCORE</b>, <b>CORRECT SCORE</b> or <b>UNDO LAST SCORE</b> if an entry needs attention.</li>
+        <li>Open <b>SAVE &amp; SENDING</b>, save the CSV for the correct section, open it and check it.</li>
+        <li>Send or share the checked CSV with the event secretary.</li>
+      </ol>
+      <div class="helpAlert"><b>Critical export check:</b> Before sending, confirm that the CSV contains every expected rider and lap. Missing scores must show as <b>MS</b>.</div>
+      <div class="actions">
+        <a class="btn dark" href="Observer_Scoring_App_User_Guide.pdf" target="_blank" rel="noopener">OPEN FULL PDF GUIDE</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="helpOffline" class="card helpSection">
+    <div class="cardHead">ADD TO HOME SCREEN &amp; USE OFFLINE</div>
+    <div class="cardBody">
+      <table class="helpTable">
+        <thead><tr><th>Device</th><th>Install steps</th></tr></thead>
+        <tbody>
+          <tr><td><b>iPhone / iPad</b></td><td>Open the hosted app in Safari, tap Share, choose Add to Home Screen, then open the installed app once while online.</td></tr>
+          <tr><td><b>Android / other</b></td><td>Open the browser menu and choose Install app or Add to Home screen. If the option is missing, reload once while online.</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li>Open the installed app once online so all app and guide files can be cached.</li>
+        <li>Test offline operation before event day.</li>
+        <li>A raw HTML file alone does not provide reliable installation or offline support; host the complete folder over HTTPS.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="helpSetup" class="card helpSection">
+    <div class="cardHead">EVENT SET UP</div>
+    <div class="cardBody">
+      <table class="helpTable">
+        <thead><tr><th>Field</th><th>What to enter</th></tr></thead>
+        <tbody>
+          <tr><td><b>Event name</b></td><td>The name used in the CSV and its filename.</td></tr>
+          <tr><td><b>Date</b></td><td>The official event date.</td></tr>
+          <tr><td><b>Section number</b></td><td>The first observed section, from 1 to 99.</td></tr>
+          <tr><td><b>Number of laps</b></td><td>The planned laps per rider, from 1 to 20.</td></tr>
+          <tr><td><b>Number of riders</b></td><td>Fixed automatically at 300, so no setup entry is required.</td></tr>
+          <tr><td><b>Observing 2 sections</b></td><td>Tick only when this device will score a second section.</td></tr>
+          <tr><td><b>2nd section number</b></td><td>A different section number from the first.</td></tr>
+          <tr><td><b>Observer details</b></td><td>Name, contact number and the event secretary's email address.</td></tr>
+        </tbody>
+      </table>
+      <div class="helpTip"><b>Autosave:</b> Setup changes save after a brief delay. Scores, corrections and undo actions save immediately, with an additional safety save every 15 seconds and when the app is hidden or closed. “Saved” means stored on this device; it does not mean a CSV has been sent.</div>
+    </div>
+  </div>
+
+  <div id="helpScoring" class="card helpSection">
+    <div class="cardHead">RECORD, CHECK &amp; CORRECT SCORES</div>
+    <div class="cardBody">
+      <h2>Record a score</h2>
+      <ol>
+        <li>Open <b>SCORING</b> and enter the rider number.</li>
+        <li>Confirm the correct section is selected.</li>
+        <li>Read the current-rider panel; it shows existing scores and the next lap.</li>
+        <li>Tap 0, 1, 2, 3 or 5 and verify the green confirmation.</li>
+      </ol>
+      <p>Laps are automatic. The app counts the rider's existing entries for that section and records the next lap. It will not accept more scores than the configured number of laps.</p>
+      <h3>Check, correct or undo</h3>
+      <table class="helpTable">
+        <thead><tr><th>Control</th><th>How to use it</th></tr></thead>
+        <tbody>
+          <tr><td><b>CHECK SCORE</b></td><td>Enter a rider number and review all recorded sections and laps for that rider.</td></tr>
+          <tr><td><b>CORRECT SCORE</b></td><td>Enter the rider, section and lap, select FIND SCORE, then choose the replacement score.</td></tr>
+          <tr><td><b>UNDO LAST SCORE</b></td><td>With the rider and section selected, remove the most recently entered score for that rider and section.</td></tr>
+        </tbody>
+      </table>
+      <div class="helpTip"><b>After a change:</b> Re-save the affected section CSV. Changing a first-section score also relocks section two until the first CSV is saved again.</div>
+    </div>
+  </div>
+
+  <div id="helpTwoSections" class="card helpSection">
+    <div class="cardHead">WORK WITH TWO SECTIONS</div>
+    <div class="cardBody">
+      <ol>
+        <li>In EVENT SET UP, tick the two-section option and enter a different second section number.</li>
+        <li>Score the first section. The second section remains locked.</li>
+        <li>After at least one first-section score has been recorded, save or successfully share the first-section CSV.</li>
+        <li>Return to SCORING; the second section is now available.</li>
+        <li>Score the second section, then save or share its separate CSV.</li>
+      </ol>
+      <p>Saving an empty first-section file does not unlock section two. If a first-section score is later added, corrected or undone, save that section again to unlock the second.</p>
+    </div>
+  </div>
+
+  <div id="helpSaving" class="card helpSection">
+    <div class="cardHead">SAVE &amp; SEND A SECTION CSV</div>
+    <div class="cardBody">
+      <ol>
+        <li>Open <b>SAVE &amp; SENDING</b> and check the event summary.</li>
+        <li>Select <b>SAVE SCORES CSV</b> for the required section.</li>
+        <li>Open the downloaded file and check the event, section, riders, laps, scores and timestamps.</li>
+        <li>Confirm every expected rider and lap is present and each unrecorded score is marked <b>MS</b>.</li>
+        <li>Select <b>SEND / SHARE CSV</b> to use the device share sheet. If sharing is unavailable, attach the downloaded file manually.</li>
+      </ol>
+      <p>Each section has its own file, named in the style <b>Event_Name_section_4_scores.csv</b>. Use <b>COPY EMAIL ADDRESS</b> to copy the saved secretary address.</p>
+    </div>
+  </div>
+
+  <div id="helpReset" class="card helpSection">
+    <div class="cardHead">RESET THE APP</div>
+    <div class="cardBody">
+      <ol>
+        <li>Save and send every required section CSV, then open each file to verify it.</li>
+        <li>Return HOME and select <b>RESET APP</b>.</li>
+        <li>Select the green tick only when the event data can be removed. Select the red X or Back to cancel.</li>
+      </ol>
+      <div class="helpAlert"><b>Reset is destructive:</b> It clears event setup, scores and saved browser data. Do not reset until every required file has been checked and sent.</div>
+    </div>
+  </div>
+
+  <div id="helpTroubleshooting" class="card helpSection">
+    <div class="cardHead">TROUBLESHOOTING</div>
+    <div class="cardBody">
+      <table class="helpTable">
+        <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td>No section available</td><td>Complete EVENT SET UP and enter a valid first section number.</td></tr>
+          <tr><td>Rider outside range</td><td>Rider numbers must be between 1 and 300.</td></tr>
+          <tr><td>All laps recorded</td><td>Use CORRECT SCORE for an exact lap or UNDO LAST SCORE for that rider and section.</td></tr>
+          <tr><td>Second section locked</td><td>Record a first-section score, then save or share the first-section CSV.</td></tr>
+          <tr><td>Share downloads a file</td><td>Native sharing is unavailable; attach the downloaded CSV manually.</td></tr>
+          <tr><td>Secretary email is blank</td><td>Return to EVENT SET UP, enter it, then check SAVE &amp; SENDING again.</td></tr>
+          <tr><td>CSV lacks riders, laps or MS</td><td>Do not send it. Ask the organiser to check or repair the complete grid.</td></tr>
+          <tr><td>Install or offline use fails</td><td>Check that the complete folder is hosted over HTTPS, then launch the app once while online.</td></tr>
+          <tr><td>Saved event disappeared</td><td>Use the same browser and device. Cleared site data cannot be recovered without a saved CSV.</td></tr>
+        </tbody>
+      </table>
+      <div class="actions">
+        <button class="btn" data-go="home">BACK TO HOME</button>
+        <a class="btn dark" href="Observer_Scoring_App_User_Guide.pdf" target="_blank" rel="noopener">OPEN FULL PDF GUIDE</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div id="installModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="installTitle">
+  <div class="modalBox">
+    <div class="modalHead">
+      <span id="installTitle">ADD TO HOME SCREEN</span>
+      <button class="modalClose" data-close-modal="installModal" aria-label="Close">×</button>
+    </div>
+    <div class="modalBody">
+      <div id="installInstructions" class="notice"></div>
+      <div class="actions">
+        <button class="btn hidden" id="nativeInstallBtn">INSTALL APP</button>
+        <button class="btn alt" data-close-modal="installModal">CLOSE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="checkScoreModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="checkScoreTitle">
+  <div class="modalBox">
+    <div class="modalHead">
+      <span id="checkScoreTitle">CHECK SCORE</span>
+      <button class="modalClose" data-close-modal="checkScoreModal" aria-label="Close">×</button>
+    </div>
+    <div class="modalBody">
+      <div class="field">
+        <label for="checkRiderNo">RIDER NUMBER</label>
+        <input id="checkRiderNo" class="bigInput" inputmode="numeric" placeholder="No">
+      </div>
+      <div class="actions">
+        <button class="btn" id="runCheckScoreBtn">CHECK RIDER SCORE</button>
+      </div>
+      <div id="checkScoreResult" class="lookupResult notice">Enter a rider number to see all scores recorded on this device.</div>
+    </div>
+  </div>
+</div>
+
+<div id="correctScoreModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="correctScoreTitle">
+  <div class="modalBox">
+    <div class="modalHead">
+      <span id="correctScoreTitle">CORRECT SCORE</span>
+      <button class="modalClose" data-close-modal="correctScoreModal" aria-label="Close">×</button>
+    </div>
+    <div class="modalBody">
+      <div class="lookupGrid">
+        <div class="field">
+          <label for="correctRiderNo">RIDER NUMBER</label>
+          <input id="correctRiderNo" class="bigInput" inputmode="numeric" placeholder="No">
+        </div>
+        <div class="field">
+          <label for="correctSection">SECTION</label>
+          <select id="correctSection" class="bigInput"></select>
+        </div>
+        <div class="field">
+          <label for="correctLap">LAP</label>
+          <select id="correctLap" class="bigInput"></select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="loadCorrectionBtn">FIND SCORE</button>
+      </div>
+      <div id="correctionResult" class="lookupResult notice">Choose the rider, section and lap to find the recorded score.</div>
+      <div id="correctionControls" class="hidden">
+        <div class="notice"><b>SELECT THE CORRECT SCORE</b></div>
+        <div class="correctionScores">
+          <button data-correct-score="0">0</button>
+          <button data-correct-score="1">1</button>
+          <button data-correct-score="2">2</button>
+          <button data-correct-score="3">3</button>
+          <button data-correct-score="5">5</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="resetAppModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="resetAppTitle">
+  <div class="modalBox">
+    <div class="modalHead">
+      <span id="resetAppTitle">RESET APP</span>
+      <button class="modalClose" data-close-modal="resetAppModal" aria-label="Close">×</button>
+    </div>
+    <div class="modalBody">
+      <div class="notice" style="border:3px solid #b3261e;background:#fff1f0;text-align:center;font-size:18px;line-height:1.45">
+        <b style="font-size:24px;color:#b3261e">WARNING!</b><br><br>
+        This will reset all scores.<br>
+        Do not proceed until you have sent the section file.
+      </div>
+      <div class="actions" style="justify-content:center;margin-top:16px">
+        <button class="btn" id="confirmResetAppBtn" style="background:#187a38;color:white;border-color:#0f5c2a;font-size:24px;min-width:130px">✓</button>
+        <button class="btn" id="cancelResetAppBtn" style="background:#b3261e;color:white;border-color:#7f1a16;font-size:24px;min-width:130px">✕ Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="airplaneReminder" class="airplaneReminder hidden" role="status" aria-live="polite">Turn on airplane mode if in a area with no signal</div>
+<div class="screenAwake"><label><input id="keepScreenOn" type="checkbox" checked> Keep screen on</label><span id="screenAwakeStatus" role="status" aria-live="polite"></span></div>
+<footer>Standalone Richmond Motor Club • Observer Scoring</footer>
+
+
+<div id="passwordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="passwordTitle"><div class="modalBox"><div class="modalHead"><span id="passwordTitle">ORGANISER ACCESS</span><button class="modalClose" data-close-modal="passwordModal" aria-label="Close">×</button></div><div class="modalBody"><form id="passwordForm"><p id="passwordPurpose"></p><div class="field"><label for="accessPassword">PASSWORD</label><input id="accessPassword" type="password" autocomplete="off" required></div><p id="passwordError" role="alert"></p><button class="btn" type="submit">UNLOCK</button><button class="btn alt" type="button" data-close-modal="passwordModal">CANCEL</button></form></div></div></div>
+<div id="sendModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="sendTitle"><div class="modalBox"><div class="modalHead"><span id="sendTitle">SEND FILE</span><button class="modalClose" data-close-modal="sendModal" aria-label="Close">×</button></div><div class="modalBody"><p id="sendFileLabel"></p><div class="sendChoices"><button class="btn" id="sendEmail">SEND VIA EMAIL</button><button class="btn" id="sendWhatsapp">SEND VIA WHATSAPP</button><button class="btn" id="sendWebdav">SEND TO WEBDAV SERVER</button></div><p id="sendStatus" class="notice" role="status"></p><div class="field" id="sendCredentialField"><label for="sendWebdavPassword">WEBDAV PASSWORD (IF REQUIRED)</label><input id="sendWebdavPassword" type="password" autocomplete="off"></div><button class="btn alt hidden" id="fallbackDownload">DOWNLOAD CSV TO ATTACH</button><a class="btn alt hidden" id="fallbackOpen" target="_blank" rel="noopener">OPEN APP</a></div></div></div>
+<div id="allScoresModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="allScoresTitle"><div class="modalBox"><div class="modalHead"><span id="allScoresTitle">ALL SCORES LOG</span><button class="modalClose" data-close-modal="allScoresModal" aria-label="Close scores log">×</button></div><div class="modalBody"><p id="allScoresSummary"></p><div class="tableWrap"><table id="allScoresTable"></table></div><button class="btn" data-close-modal="allScoresModal">BACK TO SCORING</button></div></div></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const STORAGE_KEY='richmond_observer_scoring_v1';
+
+function blankState(){
+  return {
+    event:{
+      name:'',
+      date:'',
+      sectionNumber:'',
+      laps:2,
+      numberRiders:300,
+      twoSections:false,
+      secondSectionNumber:'',
+      observer:'',
+      observerContact:'',
+      secretaryEmail:'',webdavUrl:'',webdavUser:''
+    },
+    scores:[],
+    lastSavedCount:0,
+    firstSectionSaved:false
+  };
+}
+let state=loadLocal()||blankState();
+
+function normaliseState(){
+  state=state&&typeof state==='object'?state:blankState();
+  state.event=Object.assign(blankState().event,state.event||{});
+  state.event.numberRiders=300;
+  state.scores=Array.isArray(state.scores)?state.scores:[];
+  state.lastSavedCount=Number(state.lastSavedCount)||0;
+  state.firstSectionSaved=!!state.firstSectionSaved;
+}
+normaliseState();
+
+function csvEsc(v){
+  v=String(v??'');
+  return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
+}
+function parseCsvLine(line){
+  let out=[],cur='',q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){
+      if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q;
+    }else if(c===','&&!q){out.push(cur);cur=''}
+    else cur+=c;
+  }
+  out.push(cur);return out;
+}
+function safeName(s){return (s||'trials_event').replace(/[^\w.-]+/g,'_').replace(/^_+|_+$/g,'')||'trials_event'}
+function nowIso(){return new Date().toISOString()}
+function localTime(ts){try{return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(e){return ''}}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function downloadText(text,name,type='text/csv'){
+  const blob=new Blob([text],{type:type+';charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1200);
+}
+function saveLocal(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    $('autosaveText').textContent='Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  }catch(e){$('autosaveText').textContent='Local save unavailable'}
+}
+function loadLocal(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch(e){return null}}
+let saveTimer;
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveLocal,250)}
+
+function goPage(id,authorised=false){
+  if((id==='setup'||id==='save')&&!authorised){requestAccess(id);return;}
+
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  if(id==='scoring'){renderScoring();showAirplaneReminder();}
+  else hideAirplaneReminder();
+  if(id==='save')renderSave();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>goPage(b.dataset.page));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goPage(b.dataset.go));
+$('quickResume').onclick=()=>{syncUI();goPage('scoring')};
+
+$('resetAppBtn').onclick=()=>openModal('resetAppModal');
+$('cancelResetAppBtn').onclick=()=>closeModal('resetAppModal');
+$('confirmResetAppBtn').onclick=()=>{
+  state=blankState();
+  $('webdavPassword').value='';$('sendWebdavPassword').value='';
+  try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+  closeModal('resetAppModal');
+  syncUI();
+  saveLocal();
+  goPage('home');
+  alert('Richmond Motor Club • Observer Scoring has been reset.');
+};
+
+function setupSections(){
+  const s1=String(state.event.sectionNumber||'').trim();
+  const s2=String(state.event.secondSectionNumber||'').trim();
+  const arr=[];
+  if(s1)arr.push(s1);
+  if(state.event.twoSections&&s2&&s2!==s1)arr.push(s2);
+  return arr;
+}
+function scoreableSections(){
+  const sections=setupSections();
+  if(sections.length<2)return sections;
+  return state.firstSectionSaved?sections:[sections[0]];
+}
+function isSecondSection(section){
+  const sections=setupSections();
+  return sections.length>1 && String(section)===String(sections[1]);
+}
+function firstSectionHasScores(){
+  const first=String(state.event.sectionNumber||'').trim();
+  return !!first && state.scores.some(s=>String(s.section)===first);
+}
+function markFirstSectionDirty(section){
+  const first=String(state.event.sectionNumber||'').trim();
+  if(state.event.twoSections && first && String(section)===first){
+    state.firstSectionSaved=false;
+  }
+}
+function markFirstSectionSavedIfEligible(){
+  if(state.event.twoSections && setupSections().length>1 && firstSectionHasScores()){
+    state.firstSectionSaved=true;
+  }
+}
+function rebuildScoreSection(preferred){
+  const sel=$('scoreSection');
+  const sections=scoreableSections();
+  const old=preferred||sel.value;
+  sel.innerHTML='';
+  if(!sections.length){
+    const o=document.createElement('option');o.value='';o.textContent='—';sel.appendChild(o);
+    sel.disabled=true;return;
+  }
+  sel.disabled=false;
+  sections.forEach(s=>{
+    const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);
+  });
+  sel.value=sections.includes(String(old))?String(old):sections[0];
+}
+
+function syncFromUI(){
+  const previousLockKey=[
+    state.event.name,state.event.date,state.event.sectionNumber,state.event.laps,state.event.numberRiders,
+    state.event.twoSections?'1':'0',state.event.secondSectionNumber
+  ].join('|');
+
+  state.event.name=$('eventName').value.trim();
+  state.event.date=$('eventDate').value;
+  state.event.sectionNumber=$('sectionNumber').value.trim();
+  state.event.laps=Math.max(1,Math.min(20,parseInt($('laps').value)||1));
+  state.event.numberRiders=300;
+  state.event.twoSections=$('twoSections').checked;
+  state.event.secondSectionNumber=state.event.twoSections?$('secondSectionNumber').value.trim():'';
+  state.event.observer=$('observerName').value.trim();
+  state.event.observerContact=$('observerContact').value.trim();
+  state.event.secretaryEmail=$('secretaryEmail').value.trim();
+  state.event.webdavUrl=$('webdavUrl').value.trim();
+  state.event.webdavUser=$('webdavUser').value.trim();
+
+  const newLockKey=[
+    state.event.name,state.event.date,state.event.sectionNumber,state.event.laps,state.event.numberRiders,
+    state.event.twoSections?'1':'0',state.event.secondSectionNumber
+  ].join('|');
+
+  if(previousLockKey!==newLockKey)state.firstSectionSaved=false;
+
+  $('secondSectionField').classList.toggle('hidden',!state.event.twoSections);
+  rebuildScoreSection();
+  scheduleSave();
+}
+function syncUI(){
+  const e=state.event;
+  $('eventName').value=e.name||'';
+  $('eventDate').value=e.date||'';
+  $('sectionNumber').value=e.sectionNumber||'';
+  $('laps').value=e.laps||2;
+  $('twoSections').checked=!!e.twoSections;
+  $('secondSectionNumber').value=e.secondSectionNumber||'';
+  $('observerName').value=e.observer||'';
+  $('observerContact').value=e.observerContact||'';
+  $('secretaryEmail').value=e.secretaryEmail||'';
+  $('webdavUrl').value=e.webdavUrl||'';
+  $('webdavUser').value=e.webdavUser||'';
+  $('secondSectionField').classList.toggle('hidden',!e.twoSections);
+  rebuildScoreSection();
+  if(document.getElementById('correctSection'))fillCorrectionSelectors();
+  renderScoring();
+  renderSave();
+}
+['eventName','eventDate','sectionNumber','laps','secondSectionNumber','observerName','observerContact','secretaryEmail','webdavUrl','webdavUser']
+  .forEach(id=>$(id).addEventListener('input',()=>{syncFromUI();renderScoring()}));
+$('twoSections').addEventListener('change',()=>{
+  syncFromUI();
+  if($('twoSections').checked)setTimeout(()=>$('secondSectionNumber').focus(),0);
+  renderScoring();
+});
+
+function scoresFor(no,section){
+  return state.scores.filter(s=>String(s.riderNo)===String(no)&&String(s.section)===String(section)).sort((a,b)=>a.lap-b.lap);
+}
+function nextLap(no,section){return scoresFor(no,section).length+1}
+
+$('scoreRiderNo').addEventListener('input',renderCurrentRider);
+$('scoreSection').addEventListener('change',()=>{
+  saveLocal();
+  renderScoring();
+});
+
+function renderCurrentRider(){
+  const no=$('scoreRiderNo').value.trim();
+  const section=$('scoreSection').value;
+  if(!no){
+    $('currentRider').innerHTML='<div class="no">—</div>';
+    $('scoreStatus').textContent='Enter a rider number to begin.';
+    return;
+  }
+  $('currentRider').innerHTML=`<div class="no">${escapeHtml(no)}</div>`;
+  if(!section){
+    $('scoreStatus').textContent='Set the section number in EVENT SET UP before scoring.';
+    return;
+  }
+  const existing=scoresFor(no,section);
+  const lap=existing.length+1;
+  if(existing.length>=state.event.laps){
+    $('scoreStatus').innerHTML=`Section ${escapeHtml(section)}: <b>all ${state.event.laps} lap score(s) recorded</b> — ${existing.map(x=>escapeHtml(x.score)).join(' / ')}`;
+  }else{
+    $('scoreStatus').innerHTML=`Section ${escapeHtml(section)} • Enter <b>Lap ${lap}</b> of ${state.event.laps}${existing.length?' • Existing: '+existing.map(x=>escapeHtml(x.score)).join(' / '):''}`;
+  }
+}
+
+document.querySelectorAll('[data-score]').forEach(b=>{
+  // Preserve the rider input's focus and phone keyboard during a score tap.
+  b.addEventListener('pointerdown',e=>{if(e.isPrimary && e.button===0)e.preventDefault();});
+  b.onclick=()=>recordScore(b.dataset.score);
+});
+function recordScore(score){
+  syncFromUI();
+  const no=$('scoreRiderNo').value.trim();
+  const section=$('scoreSection').value;
+  if(!no){alert('Enter a rider number first.');return}
+  const riderLimit=parseInt(state.event.numberRiders)||0;
+  if(riderLimit && (/^\d+$/.test(no)) && (+no<1 || +no>riderLimit)){
+    alert('Rider number must be between 1 and '+riderLimit+'.');
+    return;
+  }
+  if(!section){alert('Enter the section number in EVENT SET UP first.');return}
+  if(isSecondSection(section)&&!state.firstSectionSaved){
+    alert('Section '+section+' is locked. Save the first section CSV before scoring the second section.');
+    rebuildScoreSection();
+    return;
+  }
+  const lap=nextLap(no,section);
+  if(lap>state.event.laps){
+    alert('All laps are already recorded for this rider at this section. Use Undo Last Score if you need to correct it.');
+    return;
+  }
+  markFirstSectionDirty(section);
+  state.scores.push({
+    eventName:state.event.name,
+    date:state.event.date,
+    sectionNumber:state.event.sectionNumber,
+    secondSectionNumber:state.event.twoSections?state.event.secondSectionNumber:'',
+    numberOfLaps:state.event.laps,
+    numberOfRiders:state.event.numberRiders,
+    observerName:state.event.observer,
+    observerContact:state.event.observerContact,
+    secretaryEmail:state.event.secretaryEmail,
+    section:String(section),
+    riderNo:no,
+    lap:lap,
+    score:score,
+    timestamp:nowIso()
+  });
+  saveLocal();
+  renderScoring();
+  showScoreConfirmation(no,score,lap,section);
+  $('scoreRiderNo').focus({preventScroll:true});
+  $('scoreRiderNo').select();
+}
+
+let scoreConfirmationTimer=null;
+let scoreAudioContext=null;
+function playScoreTick(){
+  try{
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+    if(!AudioContextClass)return;
+    if(!scoreAudioContext || scoreAudioContext.state==='closed')scoreAudioContext=new AudioContextClass();
+    const ctx=scoreAudioContext;
+    const tick=()=>{
+      if(ctx.state!=='running')return;
+      const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+      const now=ctx.currentTime;
+      oscillator.type='sine';
+      oscillator.frequency.setValueAtTime(1600,now);
+      oscillator.frequency.exponentialRampToValueAtTime(800,now+0.045);
+      gain.gain.setValueAtTime(0.0001,now);
+      gain.gain.exponentialRampToValueAtTime(0.22,now+0.003);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.065);
+      oscillator.connect(gain);gain.connect(ctx.destination);
+      oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();};
+      oscillator.start(now);oscillator.stop(now+0.075);
+    };
+    // Resume from the actual score-button gesture for mobile audio policies.
+    if(ctx.state!=='running')ctx.resume().then(tick).catch(()=>{});
+    else tick();
+  }catch(error){/* Audio failure must never interrupt scoring. */}
+}
+function scheduleScoreConfirmationHide(){
+  clearTimeout(scoreConfirmationTimer);
+  scoreConfirmationTimer=setTimeout(()=>$('scoreConfirmation').classList.add('hidden'),2000);
+}
+function showScoreConfirmation(riderNo,score,lap,section){
+  hideAirplaneReminder();
+  const box=$('scoreConfirmation');
+  box.innerHTML=`✓ RIDER ${escapeHtml(riderNo)} &nbsp;•&nbsp; SCORE ${escapeHtml(score)}<br>LAP ${escapeHtml(lap)} OF ${escapeHtml(state.event.laps)}<br><span style="font-size:13px;font-weight:bold">SECTION ${escapeHtml(section)} • AUTOSAVED</span>`;
+  box.classList.remove('hidden');
+  scheduleScoreConfirmationHide();
+  playScoreTick();
+}
+
+$('undoBtn').onclick=()=>{
+  const no=$('scoreRiderNo').value.trim(),section=$('scoreSection').value;
+  const inds=state.scores.map((s,i)=>({s,i})).filter(x=>String(x.s.riderNo)===no&&String(x.s.section)===String(section));
+  if(!inds.length){alert('No score to undo for this rider and section.');return}
+  const removed=state.scores[inds[inds.length-1].i];
+  markFirstSectionDirty(removed.section);
+  state.scores.splice(inds[inds.length-1].i,1);
+  $('scoreConfirmation').innerHTML=`REMOVED: RIDER ${escapeHtml(removed.riderNo)} • SCORE ${escapeHtml(removed.score)} • LAP ${escapeHtml(removed.lap)} • SECTION ${escapeHtml(removed.section)}`;
+  $('scoreConfirmation').classList.remove('hidden');
+  scheduleScoreConfirmationHide();
+  saveLocal();renderScoring();
+};
+
+
+function openModal(id){
+  $(id).classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeModal(id){
+  $(id).classList.add('hidden');
+  document.body.style.overflow='';
+}
+document.querySelectorAll('[data-close-modal]').forEach(b=>b.onclick=()=>closeModal(b.dataset.closeModal));
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{
+  if(e.target===m)closeModal(m.id);
+}));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal:not(.hidden)').forEach(m=>closeModal(m.id));
+});
+
+function fillCorrectionSelectors(){
+  const currentSection=$('correctSection').value;
+  const currentLap=$('correctLap').value;
+  const sections=setupSections();
+
+  $('correctSection').innerHTML='';
+  sections.forEach(s=>{
+    const o=document.createElement('option');
+    o.value=s;o.textContent=s;$('correctSection').appendChild(o);
+  });
+  if(sections.includes(String(currentSection)))$('correctSection').value=String(currentSection);
+
+  $('correctLap').innerHTML='';
+  for(let lap=1;lap<=state.event.laps;lap++){
+    const o=document.createElement('option');
+    o.value=lap;o.textContent=lap;$('correctLap').appendChild(o);
+  }
+  if(+currentLap>=1&&+currentLap<=state.event.laps)$('correctLap').value=currentLap;
+}
+
+$('checkScoreBtn').onclick=()=>{
+  $('checkRiderNo').value=$('scoreRiderNo').value.trim();
+  $('checkScoreResult').textContent='Enter a rider number to see all scores recorded on this device.';
+  openModal('checkScoreModal');
+  setTimeout(()=>$('checkRiderNo').focus(),50);
+  if($('checkRiderNo').value)runCheckScore();
+};
+$('runCheckScoreBtn').onclick=runCheckScore;
+$('checkRiderNo').addEventListener('keydown',e=>{if(e.key==='Enter')runCheckScore()});
+
+function runCheckScore(){
+  const no=$('checkRiderNo').value.trim();
+  if(!no){
+    $('checkScoreResult').textContent='Enter a rider number.';
+    return;
+  }
+  const riderScores=state.scores
+    .filter(s=>String(s.riderNo)===no)
+    .sort((a,b)=>String(a.section).localeCompare(String(b.section),undefined,{numeric:true})||a.lap-b.lap);
+
+  if(!riderScores.length){
+    $('checkScoreResult').innerHTML=`<b>RIDER ${escapeHtml(no)}</b><br>No scores have been recorded for this rider.`;
+    return;
+  }
+
+  let html=`<b>RIDER ${escapeHtml(no)}</b><div class="tableWrap" style="margin-top:9px;max-height:45vh"><table>
+    <thead><tr><th>SECTION</th><th>LAP</th><th>SCORE</th></tr></thead><tbody>`;
+  riderScores.forEach(s=>{
+    html+=`<tr><td>${escapeHtml(s.section)}</td><td>${escapeHtml(s.lap)}</td><td><b style="font-size:18px">${escapeHtml(s.score)}</b></td></tr>`;
+  });
+  html+='</tbody></table></div>';
+  $('checkScoreResult').innerHTML=html;
+}
+
+let correctionIndex=-1;
+$('correctScoreBtn').onclick=()=>{
+  fillCorrectionSelectors();
+  $('correctRiderNo').value=$('scoreRiderNo').value.trim();
+  if($('scoreSection').value)$('correctSection').value=$('scoreSection').value;
+  $('correctionResult').textContent='Choose the rider, section and lap to find the recorded score.';
+  $('correctionControls').classList.add('hidden');
+  correctionIndex=-1;
+  openModal('correctScoreModal');
+  setTimeout(()=>$('correctRiderNo').focus(),50);
+};
+$('loadCorrectionBtn').onclick=findCorrection;
+$('correctRiderNo').addEventListener('keydown',e=>{if(e.key==='Enter')findCorrection()});
+$('correctSection').addEventListener('change',()=>{$('correctionControls').classList.add('hidden');correctionIndex=-1});
+$('correctLap').addEventListener('change',()=>{$('correctionControls').classList.add('hidden');correctionIndex=-1});
+
+function findCorrection(){
+  const no=$('correctRiderNo').value.trim();
+  const section=$('correctSection').value;
+  const lap=+$('correctLap').value;
+  correctionIndex=state.scores.findIndex(s=>String(s.riderNo)===no&&String(s.section)===String(section)&&+s.lap===lap);
+
+  if(correctionIndex<0){
+    $('correctionResult').innerHTML=`<b>RIDER ${escapeHtml(no||'—')}</b><br>No recorded score found for Section ${escapeHtml(section||'—')}, Lap ${escapeHtml(lap||'—')}.`;
+    $('correctionControls').classList.add('hidden');
+    return;
+  }
+
+  const s=state.scores[correctionIndex];
+  $('correctionResult').innerHTML=`<b>RIDER ${escapeHtml(s.riderNo)}</b><br>SECTION ${escapeHtml(s.section)} • LAP ${escapeHtml(s.lap)}<br>CURRENT SCORE: <b style="font-size:24px">${escapeHtml(s.score)}</b>`;
+  $('correctionControls').classList.remove('hidden');
+}
+
+document.querySelectorAll('[data-correct-score]').forEach(b=>b.onclick=()=>{
+  if(correctionIndex<0)return;
+  const s=state.scores[correctionIndex];
+  const oldScore=s.score;
+  const newScore=b.dataset.correctScore;
+  markFirstSectionDirty(s.section);
+  s.score=newScore;
+  s.originalTimestamp=s.originalTimestamp||s.timestamp;
+  s.timestamp=nowIso();
+  s.corrected=true;
+  saveLocal();
+  renderScoring();
+  showScoreConfirmation(s.riderNo,newScore,s.lap,s.section);
+  $('correctionResult').innerHTML=`<b>CORRECTED</b><br>RIDER ${escapeHtml(s.riderNo)} • SECTION ${escapeHtml(s.section)} • LAP ${escapeHtml(s.lap)}<br>${escapeHtml(oldScore)} → <b style="font-size:24px">${escapeHtml(newScore)}</b>`;
+  $('correctionControls').classList.add('hidden');
+  correctionIndex=-1;
+});
+
+
+function renderScoring(){
+  rebuildScoreSection($('scoreSection').value);
+  $('kpiScores').textContent=state.scores.length;
+  $('kpiRiders').textContent=new Set(state.scores.map(s=>String(s.riderNo))).size;
+  $('kpiSection').textContent=$('scoreSection').value||'—';
+  $('kpiUnsaved').textContent=Math.max(0,state.scores.length-(state.lastSavedCount||0));
+  renderCurrentRider();
+  const recent=[...state.scores].reverse().slice(0,100);
+  let h='<thead><tr><th>Time</th><th>Section</th><th>Rider</th><th>Lap</th><th>Score</th></tr></thead><tbody>';
+  recent.forEach(s=>{
+    h+=`<tr><td>${escapeHtml(localTime(s.timestamp))}</td><td>${escapeHtml(s.section)}</td><td>${escapeHtml(s.riderNo)}</td><td>${escapeHtml(s.lap)}</td><td><b>${escapeHtml(s.score)}</b></td></tr>`;
+  });
+  h+='</tbody>';
+  $('scoreTable').innerHTML=h;
+}
+
+function scoresCsv(section){
+  section=String(section||'').trim();
+
+  const useSecondSection=!!state.event.twoSections;
+
+  const headers=[
+    'Event Name','Date','Section Number',
+    ...(useSecondSection?['2nd Section Number']:[]),
+    'Number of Laps',
+    'Observer Name','Observer Contact Number','Secretary Email Address',
+    'Scored Section','Rider No','Lap','Score','Timestamp'
+  ];
+
+  const numberOfRiders=Math.max(0,parseInt(state.event.numberRiders)||0);
+  const numberOfLaps=Math.max(1,parseInt(state.event.laps)||1);
+
+  // Build a quick lookup of recorded scores for this section.
+  const scoreMap=new Map();
+  state.scores
+    .filter(s=>String(s.section)===section)
+    .forEach(s=>{
+      scoreMap.set(String(s.riderNo)+'|'+String(s.lap),s);
+    });
+
+  const rows=[];
+
+  // When Number of Riders is set, ALWAYS export every rider and every lap.
+  // Missing scores are written as MS.
+  if(numberOfRiders>0){
+    for(let rider=1;rider<=numberOfRiders;rider++){
+      for(let lap=1;lap<=numberOfLaps;lap++){
+        const existing=scoreMap.get(String(rider)+'|'+String(lap));
+        rows.push([
+          existing?.eventName||state.event.name,
+          existing?.date||state.event.date,
+          existing?.sectionNumber||state.event.sectionNumber,
+          ...(useSecondSection?[existing?.secondSectionNumber||state.event.secondSectionNumber||'']:[]),
+          existing?.numberOfLaps||numberOfLaps,
+          existing?.observerName||state.event.observer,
+          existing?.observerContact||state.event.observerContact,
+          existing?.secretaryEmail||state.event.secretaryEmail,
+          section,
+          rider,
+          lap,
+          existing?.score!==undefined && existing?.score!==null && String(existing.score).trim()!=='' ? existing.score : 'MS',
+          existing?.timestamp||''
+        ]);
+      }
+    }
+  }else{
+    // Fallback for older events where Number of Riders has not been entered.
+    const sectionScores=state.scores
+      .filter(s=>String(s.section)===section)
+      .sort((a,b)=>
+        String(a.riderNo).localeCompare(String(b.riderNo),undefined,{numeric:true}) ||
+        (+a.lap)-(+b.lap)
+      );
+
+    if(sectionScores.length){
+      sectionScores.forEach(s=>{
+        rows.push([
+          s.eventName||state.event.name,
+          s.date||state.event.date,
+          s.sectionNumber||state.event.sectionNumber,
+          ...(useSecondSection?[s.secondSectionNumber||state.event.secondSectionNumber||'']:[]),
+          s.numberOfLaps||numberOfLaps,
+          s.observerName||state.event.observer,
+          s.observerContact||state.event.observerContact,
+          s.secretaryEmail||state.event.secretaryEmail,
+          s.section,s.riderNo,s.lap,
+          (s.score!==undefined && s.score!==null && String(s.score).trim()!=='')?s.score:'MS',
+          s.timestamp||''
+        ]);
+      });
+    }else{
+      rows.push([
+        state.event.name,state.event.date,state.event.sectionNumber,
+        ...(useSecondSection?[state.event.secondSectionNumber||'']:[]),
+        numberOfLaps,state.event.observer,state.event.observerContact,state.event.secretaryEmail,
+        section,'','','',''
+      ]);
+    }
+  }
+
+  return [headers,...rows].map(r=>r.map(csvEsc).join(',')).join('\r\n');
+}
+function scoreFileName(section){
+  return `${safeName(state.event.name)}_section_${safeName(String(section||'unknown'))}_scores.csv`;
+}
+
+function firstSectionSavedByExport(section){
+  const first=String(state.event.sectionNumber||'').trim();
+  if(String(section)!==first)return;
+  if(!firstSectionHasScores()){
+    alert('No scores have been entered for Section '+first+' yet.');
+    return;
+  }
+  state.firstSectionSaved=true;
+}
+
+function downloadSectionCsv(section){
+  section=String(section||'').trim();
+  if(!section)return;
+  const count=state.scores.filter(s=>String(s.section)===section).length;
+  if(!count&&!confirm('No scores have been recorded for Section '+section+'. Save an empty section CSV anyway?'))return;
+  downloadText(scoresCsv(section),scoreFileName(section));
+  firstSectionSavedByExport(section);
+  state.lastSavedCount=state.scores.length;
+  saveLocal();
+  renderSave();
+  renderScoring();
+}
+
+function shareSectionCsv(section){openSendChoices(section);}
+
+$('saveSectionTabs').addEventListener('click',e=>{
+  const b=e.target.closest('[data-save-section]');
+  if(b)downloadSectionCsv(b.dataset.saveSection);
+});
+$('shareSectionTabs').addEventListener('click',e=>{
+  const b=e.target.closest('[data-share-section]');
+  if(b)shareSectionCsv(b.dataset.shareSection);
+});
+
+$('loadScoresBtn').onclick=()=>$('scoreCsvFile').click();
+$('scoreCsvFile').onchange=async e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  try{
+    loadScoresCsv(await f.text());
+    alert('Scores CSV loaded.');
+  }catch(err){alert('Could not load scores: '+err.message)}
+  e.target.value='';
+};
+function inferRiderCount(scores){
+  const nums=(scores||[]).map(s=>/^\d+$/.test(String(s.riderNo))?+s.riderNo:0).filter(n=>n>0);
+  return nums.length?String(Math.max(...nums)):'';
+}
+
+function loadScoresCsv(text){
+  const lines=text.replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n').split('\n').filter(x=>x.trim());
+  if(!lines.length)throw new Error('CSV is empty');
+  const head=parseCsvLine(lines[0]).map(x=>x.trim().toLowerCase());
+  const gi=n=>head.indexOf(n.toLowerCase());
+  const required=['Event Name','Date','Section Number','Number of Laps','Observer Name','Observer Contact Number','Scored Section','Rider No','Lap','Score'];
+  for(const k of required)if(gi(k)<0)throw new Error('Missing column: '+k);
+
+  const arr=[];
+  for(let i=1;i<lines.length;i++){
+    const c=parseCsvLine(lines[i]);
+    const rider=(c[gi('Rider No')]||'').trim();
+    const score=(c[gi('Score')]||'').trim().toUpperCase();
+    if(!rider&&!score)continue;
+    if(score==='MS')continue;
+    arr.push({
+      eventName:c[gi('Event Name')]||'',
+      date:c[gi('Date')]||'',
+      sectionNumber:c[gi('Section Number')]||'',
+      secondSectionNumber:gi('2nd Section Number')>=0?(c[gi('2nd Section Number')]||''):'',
+      numberOfLaps:+(c[gi('Number of Laps')]||1),
+      numberOfRiders:gi('Number of Riders')>=0?(c[gi('Number of Riders')]||''):'',
+      observerName:c[gi('Observer Name')]||'',
+      observerContact:c[gi('Observer Contact Number')]||'',
+      secretaryEmail:gi('Secretary Email Address')>=0?(c[gi('Secretary Email Address')]||''):'',
+      section:c[gi('Scored Section')]||'',
+      riderNo:rider,
+      lap:+(c[gi('Lap')]||1),
+      score:score,
+      timestamp:gi('Timestamp')>=0?(c[gi('Timestamp')]||nowIso()):nowIso()
+    });
+  }
+
+  const first=arr[0];
+  if(first){
+    state.event.name=first.eventName;
+    state.event.date=first.date;
+    state.event.sectionNumber=first.sectionNumber;
+    state.event.laps=first.numberOfLaps||1;
+    state.event.numberRiders=300;
+    state.event.secondSectionNumber=first.secondSectionNumber||'';
+    state.event.twoSections=!!first.secondSectionNumber;
+    state.event.observer=first.observerName;
+    state.event.observerContact=first.observerContact;
+    state.event.secretaryEmail=first.secretaryEmail||'';
+  }else{
+    const c=parseCsvLine(lines[1]||'');
+    if(c.length){
+      state.event.name=c[gi('Event Name')]||'';
+      state.event.date=c[gi('Date')]||'';
+      state.event.sectionNumber=c[gi('Section Number')]||'';
+      state.event.laps=+(c[gi('Number of Laps')]||1);
+      state.event.numberRiders=300;
+      state.event.secondSectionNumber=gi('2nd Section Number')>=0?(c[gi('2nd Section Number')]||''):'';
+      state.event.twoSections=!!state.event.secondSectionNumber;
+      state.event.observer=c[gi('Observer Name')]||'';
+      state.event.observerContact=c[gi('Observer Contact Number')]||'';
+      state.event.secretaryEmail=gi('Secretary Email Address')>=0?(c[gi('Secretary Email Address')]||''):'';
+    }
+  }
+  state.scores=arr;
+  state.lastSavedCount=arr.length;
+  state.firstSectionSaved=false;
+  markFirstSectionSavedIfEligible();
+  syncUI();saveLocal();
+}
+
+
+function renderSave(){
+  const sections=setupSections();
+  const saveWrap=$('saveSectionTabs');
+  const shareWrap=$('shareSectionTabs');
+  if(document.getElementById('secretaryEmailDisplay')) $('secretaryEmailDisplay').textContent=state.event.secretaryEmail||'—';
+
+  if(!sections.length){
+    saveWrap.innerHTML='<div class="notice">Enter a section number in EVENT SET UP.</div>';
+    shareWrap.innerHTML='<div class="notice">Enter a section number in EVENT SET UP.</div>';
+  }else{
+    saveWrap.innerHTML=sections.map((section,i)=>{
+      const count=state.scores.filter(s=>String(s.section)===String(section)).length;
+      const expected=(parseInt(state.event.numberRiders)||0)*(parseInt(state.event.laps)||1);
+      const locked=i===1&&!state.firstSectionSaved;
+      return `<button class="btn ${locked?'alt':''}" data-save-section="${escapeHtml(section)}" ${locked?'disabled':''}>SECTION ${escapeHtml(section)}<br><span style="font-size:11px">${locked?'LOCKED':count+' ENTERED'+(expected?' / '+expected:'')+' • SAVE CSV'}</span></button>`;
+    }).join('');
+
+    shareWrap.innerHTML=sections.map((section,i)=>{
+      const count=state.scores.filter(s=>String(s.section)===String(section)).length;
+      const locked=i===1&&!state.firstSectionSaved;
+      return `<button class="btn ${locked?'alt':''}" data-share-section="${escapeHtml(section)}" ${locked?'disabled':''}>SECTION ${escapeHtml(section)}<br><span style="font-size:11px">${locked?'LOCKED':count+' SCORES • SEND FILE'}</span></button>`;
+    }).join('');
+  }
+
+  const sectionLines=sections.map((section,i)=>{
+    const count=state.scores.filter(s=>String(s.section)===String(section)).length;
+    const lockText=i===1&&!state.firstSectionSaved?' — LOCKED UNTIL FIRST SECTION IS SAVED':'';
+    return `Section ${escapeHtml(section)}: <b>${count} score${count===1?'':'s'}</b>${lockText}`;
+  }).join('<br>');
+
+  $('exportSummary').innerHTML=
+    `<b>${escapeHtml(state.event.name||'Unnamed event')}</b><br>`+
+    `Date: ${escapeHtml(state.event.date||'—')}<br>`+
+    `Number of laps: ${escapeHtml(state.event.laps||'—')}<br>`+
+    `Number of riders: ${escapeHtml(state.event.numberRiders||'—')}<br>`+
+    `Observer: ${escapeHtml(state.event.observer||'—')}<br>`+
+    `Contact: ${escapeHtml(state.event.observerContact||'—')}<br>`+
+    `Secretary email: ${escapeHtml(state.event.secretaryEmail||'—')}<br>`+
+    (sectionLines||'No section configured');
+}
+
+
+
+$('copySecretaryEmailBtn').onclick=async()=>{
+  const email=(state.event.secretaryEmail||'').trim();
+  if(!email){alert('No secretary email address has been entered in EVENT SET UP.');return}
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(email);
+    }else{
+      const ta=document.createElement('textarea');
+      ta.value=email;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    }
+    $('copySecretaryEmailBtn').textContent='COPIED ✓';
+    setTimeout(()=>$('copySecretaryEmailBtn').textContent='COPY EMAIL ADDRESS',1400);
+  }catch(err){
+    alert('Could not copy the email address. Select and copy it manually: '+email);
+  }
+};
+
+// ---------- SCREEN AWAKE / SIGNAL REMINDER ----------
+let airplaneReminderTimer=null;
+function hideAirplaneReminder(){
+  clearTimeout(airplaneReminderTimer);
+  $('airplaneReminder').classList.add('hidden');
+}
+function showAirplaneReminder(){
+  clearTimeout(airplaneReminderTimer);
+  $('airplaneReminder').classList.remove('hidden');
+  airplaneReminderTimer=setTimeout(hideAirplaneReminder,5000);
+}
+let screenWakeLock=null;
+let screenWakePending=false;
+function setScreenAwakeStatus(message){$('screenAwakeStatus').textContent=message;}
+async function requestScreenAwake(){
+  if(!$('keepScreenOn').checked || document.visibilityState!=='visible')return;
+  if(!('wakeLock' in navigator) || !window.isSecureContext){
+    setScreenAwakeStatus('Unavailable — use your phone’s screen timeout settings.');return;
+  }
+  if(screenWakePending || (screenWakeLock && !screenWakeLock.released))return;
+  screenWakePending=true;
+  try{
+    const lock=await navigator.wakeLock.request('screen');
+    if(!$('keepScreenOn').checked || document.visibilityState!=='visible'){
+      await lock.release();return;
+    }
+    screenWakeLock=lock;
+    setScreenAwakeStatus('Screen staying on');
+    lock.addEventListener('release',()=>{
+      if(screenWakeLock!==lock)return;
+      screenWakeLock=null;
+      setScreenAwakeStatus($('keepScreenOn').checked?'Screen may sleep — tap the app to retry.':'Normal screen timeout');
+    });
+  }catch(error){
+    setScreenAwakeStatus('Screen may sleep — check battery saver or screen timeout.');
+  }finally{screenWakePending=false;}
+}
+$('keepScreenOn').addEventListener('change',()=>{
+  if($('keepScreenOn').checked){requestScreenAwake();return;}
+  const lock=screenWakeLock;screenWakeLock=null;
+  if(lock)lock.release().catch(()=>{});
+  setScreenAwakeStatus('Normal screen timeout');
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')requestScreenAwake();
+});
+window.addEventListener('pageshow',requestScreenAwake);
+document.addEventListener('pointerup',requestScreenAwake,{passive:true});
+document.addEventListener('keydown',requestScreenAwake);
+requestScreenAwake();
+
+// ---------- PWA / ADD TO HOME SCREEN ----------
+let deferredInstallPrompt=null;
+
+function isIos(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
+}
+function showInstallHelp(){
+  const msg=$('installInstructions');
+  const nativeBtn=$('nativeInstallBtn');
+  nativeBtn.classList.add('hidden');
+
+  if(isStandalone()){
+    msg.innerHTML='<b>Richmond Motor Club • Observer Scoring is already installed on this device.</b><br><br>It can be opened directly from your Home Screen and will continue to work offline after the app files have been cached.';
+  }else if(deferredInstallPrompt){
+    msg.innerHTML='<b>Install Richmond Motor Club • Observer Scoring on this device.</b><br><br>Press INSTALL APP below. Once installed, it can be launched from the Home Screen like a normal app.';
+    nativeBtn.classList.remove('hidden');
+  }else if(isIos()){
+    msg.innerHTML='<b>iPhone / iPad</b><br><br>Open this page in <b>Safari</b>, tap <b>Share</b>, then choose <b>Add to Home Screen</b>. After adding it, open the new <b>Richmond Motor Club • Observer Scoring</b> icon once while you still have internet. The app files will then be stored for offline use.';
+  }else{
+    msg.innerHTML='<b>Android</b><br><br>Open this page in <b>Chrome</b>. Use the browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>. After installation, open the app once while online so the offline files are cached.';
+  }
+  openModal('installModal');
+}
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+});
+window.addEventListener('appinstalled',()=>{
+  deferredInstallPrompt=null;
+});
+
+$('installAppBtn').onclick=showInstallHelp;
+$('nativeInstallBtn').onclick=async()=>{
+  if(!deferredInstallPrompt)return;
+  deferredInstallPrompt.prompt();
+  try{await deferredInstallPrompt.userChoice}catch(e){}
+  deferredInstallPrompt=null;
+  closeModal('installModal');
+};
+
+// Register the offline service worker.
+// Service workers require HTTPS (or localhost during testing).
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./service-worker.js').catch(err=>{
+      console.warn('Offline service worker could not be registered:',err);
+    });
+  });
+}
+
+// Persist immediately whenever the app is backgrounded, the screen is locked,
+// the browser/tab is being discarded, or the page is closed.
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden')saveLocal();
+});
+window.addEventListener('pagehide',saveLocal);
+window.addEventListener('beforeunload',saveLocal);
+document.addEventListener('freeze',saveLocal);
+
+// Periodic safety save while the app remains open.
+setInterval(saveLocal,15000);
+
+let pendingPage=null,sendSection=null;
+function requestAccess(id){
+ pendingPage=id;$('passwordPurpose').textContent='Enter the password to open '+(id==='setup'?'Event Set Up':'Save & Sending')+'.';
+ $('accessPassword').value='';$('passwordError').textContent='';openModal('passwordModal');$('accessPassword').focus();
+}
+$('passwordForm').onsubmit=e=>{
+ e.preventDefault();if($('accessPassword').value!=='Richmond2027!'){$('passwordError').textContent='Incorrect password. Please try again.';$('accessPassword').select();return;}
+ const target=pendingPage;pendingPage=null;$('accessPassword').value='';closeModal('passwordModal');goPage(target,true);
+};
+$('allScoresBtn').onclick=()=>{
+ const scores=state.scores; // Array insertion order survives corrections and local saving.
+ $('allScoresSummary').textContent=scores.length+' scores • First entry at the top, latest at the bottom.';
+ $('allScoresTable').innerHTML='<thead><tr><th>Entry</th><th>Time entered</th><th>Section</th><th>Rider</th><th>Lap</th><th>Score</th><th>Notes</th></tr></thead><tbody>'+(scores.length?scores.map((s,i)=>'<tr>'+[i+1,localTime(s.originalTimestamp||s.timestamp),s.section,s.riderNo,s.lap,s.score,s.corrected?'Corrected '+localTime(s.timestamp):''].map(v=>'<td>'+escapeHtml(v)+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="7">No scores recorded yet.</td></tr>')+'</tbody>';
+ openModal('allScoresModal');$('allScoresModal').querySelector('.tableWrap').scrollTop=0;$('allScoresModal').querySelector('button').focus();
+};
+function openSendChoices(section){
+ if(!document.querySelector('#save.active')){goPage('save');return;}
+ sendSection=String(section);$('sendFileLabel').textContent=scoreFileName(sendSection);$('sendStatus').textContent='Choose a sending option. For Email or WhatsApp, select that app in your phone’s share menu. If unavailable, download the CSV and attach it manually.';
+ $('sendWebdavPassword').value=$('webdavPassword').value;['fallbackDownload','fallbackOpen'].forEach(id=>$(id).classList.add('hidden'));openModal('sendModal');$('sendEmail').focus();
+}
+function markExported(section){firstSectionSavedByExport(section);state.lastSavedCount=state.scores.length;saveLocal();renderSave();renderScoring();}
+function showSendFallback(channel,section,csv){
+ $('sendStatus').textContent='Download the CSV, then open '+channel+' and attach the downloaded file before sending.';
+ $('fallbackDownload').classList.remove('hidden');$('fallbackDownload').onclick=()=>{downloadText(csv,scoreFileName(section));markExported(section);};
+ const subject=(state.event.name||'Richmond Motor Club')+' — Section '+section;
+ const message='Please find attached '+scoreFileName(section)+'.';
+ $('fallbackOpen').href=channel==='Email'?'mailto:'+encodeURIComponent(state.event.secretaryEmail||'')+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(message):'https://wa.me/?text='+encodeURIComponent(subject+'\n'+message);
+ $('fallbackOpen').textContent='OPEN '+channel.toUpperCase();$('fallbackOpen').classList.remove('hidden');
+}
+async function sendViaApp(channel){
+ const section=sendSection,csv=scoresCsv(section),file=new File([csv],scoreFileName(section),{type:'text/csv'});
+ if(navigator.canShare&&navigator.canShare({files:[file]})){
+  try{await navigator.share({files:[file],title:(state.event.name||'Richmond Scores')+' — Section '+section,text:'Section '+section+' scores'+(channel==='Email'&&state.event.secretaryEmail?' — Secretary: '+state.event.secretaryEmail:'')});markExported(section);$('sendStatus').textContent='File handed to the share app. Check it has been sent to the secretary.';}catch(e){if(e.name==='AbortError'){$('sendStatus').textContent='Sharing cancelled. Scores remain saved on this device.';}else showSendFallback(channel,section,csv);}
+ }else showSendFallback(channel,section,csv);
+}
+$('sendEmail').onclick=()=>sendViaApp('Email');$('sendWhatsapp').onclick=()=>sendViaApp('WhatsApp');
+$('sendWebdav').onclick=async()=>{
+ const section=sendSection;let url;
+ try{url=new URL(state.event.webdavUrl);if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash)throw Error();}catch(e){$('sendStatus').textContent='Enter a valid HTTPS WebDAV folder link in Event Set Up (without a query, fragment or embedded login).';return;}
+ if(!navigator.onLine){$('sendStatus').textContent='You are offline. Turn off airplane mode and connect before sending. Your scores remain saved.';return;}
+ const filename=scoreFileName(section).replace(/\.csv$/,'')+'_'+new Date().toISOString().replace(/[:.]/g,'-')+'.csv';
+ url.pathname=url.pathname.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+ const headers={'Content-Type':'text/csv;charset=utf-8'};
+ const user=state.event.webdavUser||'',password=$('sendWebdavPassword').value;
+ if(user||password)headers.Authorization='Basic '+btoa(Array.from(new TextEncoder().encode(user+':'+password),b=>String.fromCharCode(b)).join(''));
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
+ $('sendWebdav').disabled=true;$('sendStatus').textContent='Uploading '+filename+'…';
+ try{
+  const res=await fetch(url.href,{method:'PUT',headers,body:scoresCsv(section),signal:controller.signal,credentials:'omit',redirect:'error'});
+  if(!res.ok)throw new Error('Server returned HTTP '+res.status+(res.status===401||res.status===403?' — check username, password and write permission.':'.'));
+  markExported(section);$('sendStatus').textContent='Uploaded successfully to WebDAV: '+filename;
+ }catch(e){$('sendStatus').textContent='Upload not confirmed. '+(e.name==='AbortError'?'The server did not respond within 30 seconds.':e.message)+'\nCheck the connection, WebDAV folder and server permissions. Cross-origin servers must allow this app’s origin, PUT, Content-Type and Authorization via CORS. Scores remain on this device.';}
+ finally{clearTimeout(timer);$('sendWebdav').disabled=false;}
+};
+// Trap keyboard focus in the active popup, including its full-page scores log.
+document.addEventListener('keydown',e=>{
+ if(e.key!=='Tab')return;const modal=document.querySelector('.modal:not(.hidden)');if(!modal)return;
+ const list=[...modal.querySelectorAll('button,input,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length);if(!list.length)return;
+ const first=list[0],last=list[list.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+});
+
+syncUI();
+saveLocal();
+</script>
+</body>
+</html>
