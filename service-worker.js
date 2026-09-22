@@ -1,4 +1,4 @@
-const CACHE='richmond-scoring-300-riders-v2';
+const CACHE='richmond-continuous-log-v5';
 const ASSETS=['./','./richmond-logo.jpg','./index.html','./manifest.webmanifest','./icon-192.png?v=20260921-richmond-v1','./icon-512.png?v=20260921-richmond-v1','./icon-maskable-192.png?v=20260921-richmond-v1','./icon-maskable-512.png?v=20260921-richmond-v1','./apple-touch-icon.png?v=20260921-richmond-v1'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(self.clients.claim());});
